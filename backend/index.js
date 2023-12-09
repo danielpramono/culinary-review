@@ -1,8 +1,10 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv';
-const app = express()
-const port = 3000
+import userRoute from '../backend/routes/userRoute.js';
+import signupRoute from '../backend/routes/signupRoute.js';
+const app = express();
+const port = 3000;
 dotenv.config();
 
 mongoose
@@ -14,6 +16,12 @@ mongoose
     console.log(err);
 });
 
+
+app.use(express.json());
+
 app.listen(port, () => {
   console.log(`Sever running on port ${port}`)
 })
+
+app.use('/backend', userRoute)
+app.use('/backend', signupRoute)
