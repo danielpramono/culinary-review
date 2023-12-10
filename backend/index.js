@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv';
 import userRoute from '../backend/routes/userRoute.js';
 import signupRoute from '../backend/routes/signupRoute.js';
+import signinRoute from '../backend/routes/signinRoute.js';
 const app = express();
 const port = 3000;
 dotenv.config();
@@ -25,6 +26,7 @@ app.listen(port, () => {
 
 app.use('/backend', userRoute)
 app.use('/backend', signupRoute)
+app.use('/backend', signinRoute)
 
 
 app.use((err, req, res, next) => {
