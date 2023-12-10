@@ -1,7 +1,8 @@
 import User from '../models/userModel.js';
 import bcryptjs from 'bcryptjs';
+import { errorHandle } from '../utils/error.js';
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
     const {username, email, password} = req.body
     const hashedPass = bcryptjs.hashSync(password, 10)
     try {
@@ -10,8 +11,8 @@ export const signup = async (req, res) => {
         res.status(200).send({success: true, massage: "Berhasil menambahkan user"})
     } catch (err) {
         if (err.name === 'MongoServerError' && err.code === 11000){
-            return res.status(400).json({success: false ,message: "User already exist", err})
+            return next(err)
         }
-        return res.status(401).send({success: false, message: "Error saat menambahkan user", err})
+        return next(errorHandle(300, 'Gagal menambahkan user'))
     }
 };
