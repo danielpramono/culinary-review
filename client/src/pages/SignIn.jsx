@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
+import {useDispatch, useSelector} from 'react-redux'; 
+import Auth from '../components/OAuth';
 
 export default function SignIn() {
   const [formData, setformData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const {loading, error} = useSelector((state) => state.user);
+  console.log(loading, error);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleChange = (e) => {
     setformData({...formData, [e.target.id]: e.target.value})
   }
- // console.log(formData); 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      setError(false);
+      dispatch(signInStart());
       const res = await fetch('/backend/signin', {
         method: "POST",
         headers: {
@@ -24,39 +25,51 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
         const data = await res.json();
-        setLoading(false);
         if(data.success === false){
-          setError(true);
+          dispatch(signInFailure(data.message));
           return
         }
+        dispatch(signInSuccess(data))
       navigate('/');
     } catch (error) {
-      setLoading(false); 
-      setError(true);
+      dispatch(signInFailure(error));
     }
   };
   return (
-    <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input type="email" placeholder="me@example.com" required id="email" className="bg-slate-100 p-3 
-        rounded-lg" onChange={handleChange}/>
-        <input type="password" placeholder="Password" required id="password" autoComplete="on" className="bg-slate-100 p-3 
-        rounded-lg" onChange={handleChange}/>
-        <button disabled={loading} className="bg-slate-800 text-white p-3 rounded-lg uppercase
-        hover:opacity-95 disabled:opacity-65">
-          {loading ? 'Loading...': 'Sign In'}
+    <div className='p-3 max-w-lg mx-auto'>
+      <h1 className='text-3xl text-center font-semibold my-7'>Sign In</h1>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+        <input
+          type='email'
+          placeholder='Email'
+          id='email'
+          className='bg-slate-100 p-3 rounded-lg'
+          onChange={handleChange}
+        />
+        <input
+          type='password'
+          placeholder='Password'
+          id='password'
+          className='bg-slate-100 p-3 rounded-lg'
+          onChange={handleChange}
+        />
+        <button
+          disabled={loading}
+          className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80'
+        >
+          {loading ? 'Loading...' : 'Sign In'}
         </button>
+        <Auth />
       </form>
-      <div className="flex gap-2 mt-5">
-        <p> Don&rsquo;t Have an account ?</p>
+      <div className='flex gap-2 mt-5'>
+        <p>Dont Have an account?</p>
         <Link to='/signup'>
-          <span className="text-blue-700">Sign Up</span>
+          <span className='text-blue-500'>Sign up</span>
         </Link>
       </div>
-      <p className="text-red-600">
-        {error && 'Something went wrong'}
+      <p className='text-red-700 mt-5'>
+        {error ? error || 'Something went wrong!' : ''}
       </p>
     </div>
-  )
+  );
 }

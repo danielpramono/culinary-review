@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoute from '../backend/routes/userRoute.js';
 import signupRoute from '../backend/routes/signupRoute.js';
 import signinRoute from '../backend/routes/signinRoute.js';
+import googleRoute from '../backend/routes/googleRoute.js';
 const app = express();
 const port = 3000;
 dotenv.config();
@@ -27,14 +28,15 @@ app.listen(port, () => {
 app.use('/backend', userRoute)
 app.use('/backend', signupRoute)
 app.use('/backend', signinRoute)
+app.use('/backend', googleRoute)
 
 
 app.use((err, req, res, next) => {
-  const statuscode = err.statuscode || 500;
-  const message = err.message || 'Internar Server Error';
-  return res.status(statuscode).json({
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+  return res.status(statusCode).json({
     success: false,
     message,
-    statuscode
+    statusCode,
   });
 });
